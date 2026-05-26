@@ -1,16 +1,70 @@
-# React + Vite
+# Pensus
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Reverse Budget & Wealth Allocation Engine**
 
-Currently, two official plugins are available:
+Pensus is a premium, intent-driven financial management tool built on the philosophy of "Paying Yourself First." Unlike traditional budget trackers that focus on reactive spending, Pensus utilizes a reverse budgeting logic to allocate incoming wealth into specific goals before you even see what is left to spend.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🛠️ Technology Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* **Frontend**: React.js (Vite)
+* **Styling**: Tailwind CSS
+* **Icons**: Lucide React
+* **Architecture**: Component-based modular design
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 Getting Started
+
+### 1. Clone the repository
+```bash
+git clone [https://github.com/your-org/pensus.git](https://github.com/your-org/pensus.git)
+cd pensus
+```
+2. Install dependencies
+```bash
+npm install
+```
+3. Run the development server
+```bash
+npm run dev
+```
+The application will run at http://localhost:5173.
+
+🧩 Project Structure
+```Plaintext
+src/
+├── components/
+│   ├── common/         # Reusable UI primitives (Modals, Buttons)
+│   ├── dashboard/      # Main dashboard & transaction flow logic
+│   ├── goals/          # Milestone tracking and audit logs
+│   └── accounts/       # Asset management & balance history
+├── utils/
+│   └── formatters.js   # Currency and locale processing
+└── App.jsx             # Main application orchestration
+```
+🏗️ Design Philosophy
+Pensus was built with a "Command Center" approach:
+
+Intentionality: Every transaction is weighed and considered before execution.
+
+Consistency: A unified design language across all modals and panels ensures a premium user experience.
+
+Transparency: Real-time auditing of every fund movement ensures full visibility into your asset base.
+
+🤝 Contributing
+Fork the repository.
+
+Create a new branch: git checkout -b feature/your-feature-name
+
+Commit your changes: git commit -am 'Add new feature'
+
+Push to your branch: git push origin feature/your-feature-name
+
+Open a Pull Request.
+
+📞 Contact
+For questions, support, or feedback, contact makkunii at mmanuel.eugene@gmail.com.
+
+Built with precision. Pensus: Sovereignty over your wealth flow.
