@@ -1,0 +1,32 @@
+[
+  {
+    "code": "PHP",
+    "name": "Philippine Peso",
+    "symbol": "₱",
+    "locale": "en-PH"
+  },
+  {
+    "code": "USD",
+    "name": "US Dollar",
+    "symbol": "$",
+    "locale": "en-US"
+  },
+  {
+    "code": "EUR",
+    "name": "Euro",
+    "symbol": "€",
+    "locale": "de-DE"
+  },
+  {
+    "code": "JPY",
+    "name": "Japanese Yen",
+    "symbol": "¥",
+    "locale": "ja-JP"
+  },
+  {
+    "code": "GBP",
+    "name": "British Pound",
+    "symbol": "£",
+    "locale": "en-GB"
+  }
+]
