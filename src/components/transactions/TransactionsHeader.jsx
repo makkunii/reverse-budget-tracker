@@ -1,10 +1,11 @@
 import React from 'react';
-import { Plus, Receipt, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
+import { Plus, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 
 export function TransactionsHeader({ 
   onOpenLogTransaction, stats, period, setPeriod, 
   selectedDate, setSelectedDate, month, setMonth, 
-  year, setYear, isExpanded, setIsExpanded 
+  year, setYear, isExpanded, setIsExpanded,
+  currency, locale // 1. Added these props
 }) {
   return (
     <div className="space-y-6">
@@ -42,7 +43,7 @@ export function TransactionsHeader({
 
         {isExpanded && (
           <div className="border-t border-slate-100 bg-slate-50/50 p-4 space-y-4">
-            {/* Control Bar: Now responsive */}
+            {/* Control Bar */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {['daily', 'monthly', 'yearly', 'custom'].map((p) => (
                 <button 
@@ -54,7 +55,7 @@ export function TransactionsHeader({
               ))}
             </div>
 
-            {/* Selectors: Now responsive */}
+            {/* Selectors */}
             {(period === 'monthly' || period === 'yearly' || period === 'custom') && (
               <div className="grid grid-cols-2 gap-2">
                 {period === 'monthly' && (
@@ -73,14 +74,15 @@ export function TransactionsHeader({
               </div>
             )}
 
-            {/* Metrics Grid: Now responsive stack */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-              <div className="sm:col-span-3">
-                <Metric label="Net Balance" value={stats.net} color="text-slate-900" />
+            {/* Metrics Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <div className="sm:col-span-2">
+                <Metric label="Net Balance" value={stats.net} color="text-slate-900" currency={currency} locale={locale} />
               </div>
-              <Metric label="Income" value={stats.income} color="text-emerald-600" />
-              <Metric label="Expense" value={stats.expense} color="text-rose-600" />
-              <Metric label="Avg Flow" value={(stats.avgIncome - stats.avgExpense)} color="text-slate-600" />
+              <Metric label="Total Income" value={stats.income} color="text-emerald-600" currency={currency} locale={locale} />
+              <Metric label="Total Expense" value={stats.expense} color="text-rose-600" currency={currency} locale={locale} />
+              <Metric label="Avg Income" value={stats.avgIncome} color="text-emerald-600" currency={currency} locale={locale} />
+              <Metric label="Avg Expense" value={stats.avgExpense} color="text-rose-600" currency={currency} locale={locale} />
             </div>
           </div>
         )}
@@ -89,11 +91,20 @@ export function TransactionsHeader({
   );
 }
 
-function Metric({ label, value, color }) {
+function Metric({ label, value, color, currency, locale }) {
+  // 2. Added safety fallbacks to prevent the TypeError
+  const safeCurrency = currency || 'PHP';
+  const safeLocale = locale || 'en-PH';
+  
   return (
-    <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex-1">
+    <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
       <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-1">{label}</p>
-      <p className={`text-sm font-black tracking-tight ${color}`}>${value.toLocaleString()}</p>
+      <p className={`text-sm font-black tracking-tight ${color}`}>
+        {new Intl.NumberFormat(safeLocale, { 
+          style: 'currency', 
+          currency: safeCurrency 
+        }).format(value || 0)}
+      </p>
     </div>
   );
 }

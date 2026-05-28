@@ -21,10 +21,20 @@ export function TransactionsPage({ transactions = [], currency, locale, onOpenLo
   }, [transactions, period, selectedDate, month, year]);
 
   const stats = useMemo(() => {
-    const income = filtered.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-    const expense = filtered.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-    const count = filtered.length || 1;
-    return { income, expense, net: income - expense, avgIncome: income / count, avgExpense: expense / count };
+    const incomeTx = filtered.filter(t => t.type === 'income');
+    const expenseTx = filtered.filter(t => t.type === 'expense');
+    
+    const income = incomeTx.reduce((sum, t) => sum + t.amount, 0);
+    const expense = expenseTx.reduce((sum, t) => sum + t.amount, 0);
+
+    return { 
+      income, 
+      expense, 
+      net: income - expense, 
+      // Divide by the count of THAT type only
+      avgIncome: incomeTx.length > 0 ? income / incomeTx.length : 0, 
+      avgExpense: expenseTx.length > 0 ? expense / expenseTx.length : 0 
+    };
   }, [filtered]);
 
   return (
@@ -37,6 +47,8 @@ export function TransactionsPage({ transactions = [], currency, locale, onOpenLo
         month={month} setMonth={setMonth}
         year={year} setYear={setYear}
         isExpanded={isExpanded} setIsExpanded={setIsExpanded}
+        currency={currency}
+        locale={locale}
       />
 
       <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden">
