@@ -14,8 +14,9 @@ import { TransactionFormModal } from './components/transactions/TransactionFormM
 import { TransferModal } from './components/accounts/TransferModal';
 import { WhatsNewModal } from './components/dashboard/WhatsNewModal';
 import { Header } from './components/common/Header';
+import { BuyMeACoffeeModal } from './components/dashboard/BuyMeACoffeeModal';
 
-import { Wallet } from 'lucide-react';
+import { Wallet, Coffee } from 'lucide-react';
 
 const INITIAL_APP_STATE = {
   settings: { currency: 'PHP', locale: 'en-PH', lastSeenVersion: '0.0.0' },
@@ -35,6 +36,8 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isLogTransactionOpen, setIsLogTransactionOpen] = useState(false);
+
+  const [isCoffeeModalOpen, setIsCoffeeModalOpen] = useState(false);
   
   // Modal layout states
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
@@ -449,6 +452,13 @@ export default function App() {
           onCurrencyChange={handleCurrencyChange}
         />
 
+        <button 
+  onClick={() => setIsCoffeeModalOpen(true)}
+  className="fixed bottom-6 right-6 p-4 bg-amber-500 text-white rounded-full shadow-xl hover:bg-amber-600 transition-all"
+>
+  <Coffee size={24} />
+</button>
+
         {/* Global Navigation Component */}
         <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
 
@@ -533,6 +543,11 @@ export default function App() {
           currentVersion="1.0.6" 
           lastSeenVersion={appState.settings.lastSeenVersion}
           onUpdateVersion={handleUpdateVersion}
+        />
+
+        <BuyMeACoffeeModal 
+          isOpen={isCoffeeModalOpen} 
+          onClose={() => setIsCoffeeModalOpen(false)} 
         />
       </div>
     </div>
