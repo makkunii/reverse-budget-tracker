@@ -5,7 +5,7 @@ import currencies from './data/currencies.json';
 import { DashboardPage } from './components/Pages/DashboardPage';
 import { AccountManager } from './components/accounts/AccountManager';
 import { GoalsPage } from './components/Pages/GoalsPage';
-import { TransactionsPage } from './components/pages/TransactionsPage';
+import { TransactionsPage } from './components/Pages/TransactionsPage';
 import { Navigation } from './components/common/Navigation';
 import { Modal } from './components/common/Modal';
 import { GoalFormModal } from './components/goals/GoalFormModal';
