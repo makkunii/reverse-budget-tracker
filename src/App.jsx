@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import currencies from './data/currencies.json';
 
-import { DashboardPage } from './components/Pages/DashboardPage';
+import { DashboardPage } from './components/pages/DashboardPage';
 import { AccountManager } from './components/accounts/AccountManager';
-import { GoalsPage } from './components/Pages/GoalsPage';
+import { GoalsPage } from './components/pages/GoalsPage';
 import { Navigation } from './components/common/Navigation';
 import { Modal } from './components/common/Modal';
 import { GoalFormModal } from './components/goals/GoalFormModal';
