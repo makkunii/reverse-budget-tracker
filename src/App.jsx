@@ -1,20 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import currencies from './data/currencies.json';
 
 import { DashboardPage } from './components/Pages/DashboardPage';
 import { AccountManager } from './components/accounts/AccountManager';
 import { GoalsPage } from './components/Pages/GoalsPage';
+import { TransactionsPage } from './components/pages/TransactionsPage';
 import { Navigation } from './components/common/Navigation';
 import { Modal } from './components/common/Modal';
 import { GoalFormModal } from './components/goals/GoalFormModal';
 import { CategoryManagerModal } from './components/goals/CategoryManagerModal';
+import { TransactionFormModal } from './components/transactions/TransactionFormModal';
+import { TransferModal } from './components/accounts/TransferModal';
+import { WhatsNewModal } from './components/dashboard/WhatsNewModal';
 import { Header } from './components/common/Header';
 
 import { Wallet } from 'lucide-react';
 
 const INITIAL_APP_STATE = {
-  settings: { currency: 'PHP', locale: 'en-PH' },
+  settings: { currency: 'PHP', locale: 'en-PH', lastSeenVersion: '0.0.0' },
   accounts: [],
   categories: [
     { id: 'cat-1', name: 'Emergency Fund', color: '#f43f5e' },
@@ -22,12 +26,15 @@ const INITIAL_APP_STATE = {
     { id: 'cat-3', name: 'Big Purchases', color: '#f59e0b' }
   ],
   goals: [],
-  history: []
+  history: [],
+  transactions: [],
 };
 
 export default function App() {
   const [appState, setAppState] = useLocalStorage('reverse_budget_v5_data', INITIAL_APP_STATE);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [isLogTransactionOpen, setIsLogTransactionOpen] = useState(false);
   
   // Modal layout states
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
@@ -314,6 +321,121 @@ export default function App() {
     }
   };
 
+  const handleLogTransaction = (txData) => {
+    const timestamp = new Date().toLocaleDateString('en-US', { 
+      month: 'short', day: 'numeric', year: 'numeric' 
+    });
+
+    setAppState(prev => {
+      const targetAccount = prev.accounts.find(a => a.id === txData.accountId);
+      if (!targetAccount) return prev;
+
+      const newTransaction = {
+        id: crypto.randomUUID(),
+        date: timestamp,
+        ...txData,
+        accountName: targetAccount.name,
+        amount: parseFloat(txData.amount)
+      };
+
+      const updatedAccounts = prev.accounts.map(acc => {
+        if (acc.id === txData.accountId) {
+          const adjustment = txData.type === 'income' ? txData.amount : -txData.amount;
+          return { 
+            ...acc, 
+            balance: acc.balance + adjustment,
+            transactionLogs: [{ 
+              id: newTransaction.id, 
+              date: timestamp, 
+              type: txData.type === 'income' ? 'deposit' : 'withdraw', 
+              amount: txData.amount, 
+              description: txData.description 
+            }, ...acc.transactionLogs]
+          };
+        }
+        return acc;
+      });
+
+      return { 
+        ...prev, 
+        accounts: updatedAccounts, 
+        transactions: [newTransaction, ...prev.transactions] 
+      };
+    });
+  };
+
+  const handleTransferFunds = ({ sourceAccountId, targetAccountId, amount }) => {
+    setAppState(prev => {
+      const sourceAcc = prev.accounts.find(a => a.id === sourceAccountId);
+      const targetAcc = prev.accounts.find(a => a.id === targetAccountId);
+      if (!sourceAcc || !targetAcc || sourceAcc.balance < amount) return prev;
+
+      const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+      const updatedAccounts = prev.accounts.map(acc => {
+        if (acc.id === sourceAccountId) return { ...acc, balance: acc.balance - amount, transactionLogs: [{ id: crypto.randomUUID(), date: timestamp, type: 'withdraw', amount, description: `Transfer to ${targetAcc.name}` }, ...acc.transactionLogs] };
+        if (acc.id === targetAccountId) return { ...acc, balance: acc.balance + amount, transactionLogs: [{ id: crypto.randomUUID(), date: timestamp, type: 'deposit', amount, description: `Transfer from ${sourceAcc.name}` }, ...acc.transactionLogs] };
+        return acc;
+      });
+
+      return { ...prev, accounts: updatedAccounts };
+    });
+  };
+
+  useEffect(() => {
+    const now = new Date();
+    let hasChanges = false;
+
+    const updatedAccounts = appState.accounts.map(acc => {
+      if (acc.type !== 'High-Yield Savings' || !acc.interestRate) return acc;
+
+      // Check logs for recent payout
+      const lastInterestLog = acc.transactionLogs
+        ?.filter(log => log.description === 'Automatic Interest Payout')
+        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+      const lastDate = lastInterestLog ? new Date(lastInterestLog.date) : null;
+      
+      // Determine if payout is needed based on frequency
+      const needsPayout = !lastDate || (
+        (acc.frequency === 'Daily' && now.toDateString() !== lastDate.toDateString()) ||
+        (acc.frequency === 'Monthly' && (now.getMonth() !== lastDate.getMonth() || now.getFullYear() !== lastDate.getFullYear())) ||
+        (acc.frequency === 'Quarterly' && (Math.floor(now.getMonth() / 3) !== Math.floor(lastDate.getMonth() / 3) || now.getFullYear() !== lastDate.getFullYear())) ||
+        (acc.frequency === 'Yearly' && now.getFullYear() !== lastDate.getFullYear())
+      );
+
+      if (needsPayout) {
+        hasChanges = true;
+        const payout = acc.balance * (acc.interestRate / 100);
+        const payoutLog = {
+          id: crypto.randomUUID(),
+          date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          type: 'deposit',
+          amount: payout,
+          description: 'Automatic Interest Payout'
+        };
+
+        return {
+          ...acc,
+          balance: acc.balance + payout,
+          transactionLogs: [payoutLog, ...(acc.transactionLogs || [])]
+        };
+      }
+      return acc;
+    });
+
+    if (hasChanges) {
+      setAppState(prev => ({ ...prev, accounts: updatedAccounts }));
+    }
+  },[]);
+
+  const handleUpdateVersion = (version) => {
+    setAppState(prev => ({
+      ...prev,
+      settings: { ...prev.settings, lastSeenVersion: version }
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 p-4 md:p-10">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -345,6 +467,7 @@ export default function App() {
               onSaveAccount={handleAddAccount}
               onDeleteAccount={handleDeleteAccount}
               onUpdateAccountFunds={handleUpdateAccountFunds}
+              onOpenTransfer={() => setIsTransferModalOpen(true)}
               currency={currentCurrency} 
               locale={currentLocale} 
               symbol={activeCurrencyMeta.symbol}
@@ -358,6 +481,17 @@ export default function App() {
               onOpenAddGoal={handleOpenAddGoal} onOpenEditGoal={handleOpenEditGoal} onDeleteGoal={handleDeleteGoal}
               onUpdateGoalFunds={handleUpdateGoalFunds}
               onOpenCategoryManager={() => setIsCatModalOpen(true)}
+            />
+          )}
+
+          {activeTab === 'transactions' && (
+            <TransactionsPage 
+              transactions={appState.transactions}
+              accounts={appState.accounts}
+              currency={currentCurrency}
+              locale={currentLocale}
+              symbol={activeCurrencyMeta.symbol}
+              onOpenLogTransaction={() => setIsLogTransactionOpen(true)}
             />
           )}
         </main>
@@ -379,6 +513,27 @@ export default function App() {
           />
         </Modal>
 
+        <TransferModal 
+          isOpen={isTransferModalOpen} 
+          onClose={() => setIsTransferModalOpen(false)} 
+          onTransfer={handleTransferFunds}
+          accounts={appState.accounts}
+          symbol={activeCurrencyMeta.symbol}
+        />
+
+        <TransactionFormModal 
+          isOpen={isLogTransactionOpen} 
+          onClose={() => setIsLogTransactionOpen(false)} 
+          onSave={handleLogTransaction}
+          accounts={appState.accounts}
+          symbol={activeCurrencyMeta.symbol}
+        />
+
+        <WhatsNewModal 
+          currentVersion="1.0.6" 
+          lastSeenVersion={appState.settings.lastSeenVersion}
+          onUpdateVersion={handleUpdateVersion}
+        />
       </div>
     </div>
   );

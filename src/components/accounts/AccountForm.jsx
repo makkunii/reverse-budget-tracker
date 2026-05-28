@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Save, Wallet, Building2, CreditCard } from 'lucide-react';
+import { Plus, Save } from 'lucide-react';
 
 export function AccountForm({ onSaveAccount, onClose, symbol, editAccount = null }) {
   const [name, setName] = useState('');
   const [balance, setBalance] = useState('');
   const [type, setType] = useState('Digital Wallet');
+  const [interestRate, setInterestRate] = useState('');
+  const [frequency, setFrequency] = useState('Monthly');
 
   useEffect(() => {
     if (editAccount) {
       setName(editAccount.name);
       setBalance(editAccount.balance.toString());
       setType(editAccount.type);
-    } else {
-      setName('');
-      setBalance('');
-      setType('Digital Wallet');
+      setInterestRate(editAccount.interestRate?.toString() || '');
+      setFrequency(editAccount.frequency || 'Monthly');
     }
   }, [editAccount]);
 
@@ -26,7 +26,12 @@ export function AccountForm({ onSaveAccount, onClose, symbol, editAccount = null
       ...(editAccount && { id: editAccount.id }),
       name: name.trim(),
       balance: parseFloat(balance) || 0,
-      type
+      type,
+      // Only attach interest data if it's a High-Yield account
+      ...(type === 'High-Yield Savings' && {
+        interestRate: parseFloat(interestRate) || 0,
+        frequency
+      })
     });
     
     onClose();
@@ -64,42 +69,55 @@ export function AccountForm({ onSaveAccount, onClose, symbol, editAccount = null
         </div>
       </div>
 
-      {/* Account Type */}
+      {/* Category */}
       <div className="space-y-2">
         <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Account Category</label>
         <select
           value={type} 
           onChange={e => setType(e.target.value)}
-          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all cursor-pointer"
+          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl text-sm font-bold cursor-pointer outline-none"
         >
-          <option value="Digital Wallet">Digital Wallet (e.g., GCash/Maya)</option>
+          <option value="Digital Wallet">Digital Wallet</option>
           <option value="High-Yield Savings">High-Yield Savings</option>
           <option value="Traditional Bank">Traditional Bank Account</option>
         </select>
       </div>
 
+      {/* Conditional Interest Fields */}
+      {type === 'High-Yield Savings' && (
+        <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Interest (%)</label>
+            <input 
+              type="number" 
+              step="0.01"
+              placeholder="0.00"
+              value={interestRate}
+              onChange={e => setInterestRate(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl text-sm font-bold outline-none"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Frequency</label>
+            <select
+              value={frequency}
+              onChange={e => setFrequency(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl text-sm font-bold outline-none cursor-pointer"
+            >
+              <option value="Daily">Daily</option>
+              <option value="Monthly">Monthly</option>
+              <option value="Quarterly">Quarterly</option>
+              <option value="Yearly">Yearly</option>
+            </select>
+          </div>
+        </div>
+      )}
+
       {/* Actions */}
       <div className="flex gap-3 pt-2">
-        <button 
-          type="button"
-          onClick={onClose}
-          className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-2xl text-xs transition-all cursor-pointer"
-        >
-          Cancel
-        </button>
-        <button 
-          type="submit" 
-          className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-2xl text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-slate-900/10"
-        >
-          {editAccount ? (
-            <>
-              <Save size={14} /> Update Account
-            </>
-          ) : (
-            <>
-              <Plus size={14} /> Register Account
-            </>
-          )}
+        <button type="button" onClick={onClose} className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-2xl text-xs transition-all">Cancel</button>
+        <button type="submit" className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-slate-900/10 transition-all">
+          {editAccount ? <><Save size={14} /> Update Account</> : <><Plus size={14} /> Register Account</>}
         </button>
       </div>
     </form>

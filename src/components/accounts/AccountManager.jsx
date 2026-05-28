@@ -6,7 +6,7 @@ import { Modal } from '../common/Modal';
 import { HistoryModal } from './HistoryModal';
 import { AccountHeader } from './AccountHeader';
 
-export function AccountManager({ accounts = [], onSaveAccount, onDeleteAccount, onUpdateAccountFunds, currency, locale, symbol }) {
+export function AccountManager({ accounts = [], onSaveAccount, onDeleteAccount, onUpdateAccountFunds, currency, locale, symbol, onOpenTransfer }) {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [activeAccount, setActiveAccount] = useState(null);
@@ -16,7 +16,8 @@ export function AccountManager({ accounts = [], onSaveAccount, onDeleteAccount, 
     <div className="space-y-6">
       <AccountHeader 
         accountCount={accounts.length} 
-        onAddAccount={() => { setActiveAccount(null); setIsFormModalOpen(true); }} 
+        onAddAccount={() => { setActiveAccount(null); setIsFormModalOpen(true); }}
+        onOpenTransfer={onOpenTransfer}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
