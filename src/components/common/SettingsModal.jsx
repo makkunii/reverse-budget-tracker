@@ -159,7 +159,7 @@ export function SettingsModal({
         {/* Version */}
         <div className="text-center pt-2">
           <p className="text-[9px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-widest">
-            Pensus v1.0.0
+            Pensus v1.0.7
           </p>
         </div>
       </div>
