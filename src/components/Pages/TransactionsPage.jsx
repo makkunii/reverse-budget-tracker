@@ -31,7 +31,6 @@ export function TransactionsPage({ transactions = [], currency, locale, onOpenLo
       income, 
       expense, 
       net: income - expense, 
-      // Divide by the count of THAT type only
       avgIncome: incomeTx.length > 0 ? income / incomeTx.length : 0, 
       avgExpense: expenseTx.length > 0 ? expense / expenseTx.length : 0 
     };
@@ -51,23 +50,28 @@ export function TransactionsPage({ transactions = [], currency, locale, onOpenLo
         locale={locale}
       />
 
-      <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm">
         {filtered.length === 0 ? (
-          <div className="text-center py-12 text-slate-400 text-sm font-bold">No transactions found.</div>
+          <div className="text-center py-12 text-slate-400 dark:text-slate-500 text-sm font-bold">No transactions found.</div>
         ) : (
-          <div className="divide-y divide-slate-100">
-            {filtered.map((tx) => (
-              <div key={tx.id} className="flex justify-between items-center p-6 hover:bg-slate-50 transition-colors">
-                <div className="flex flex-col">
-                  <span className="text-sm font-bold text-slate-900">{tx.description}</span>
-                  <span className="text-[10px] uppercase font-black text-slate-400">{tx.date} • {tx.accountName}</span>
-                </div>
-                <span className={`font-mono font-black ${tx.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                  {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount, currency, locale)}
-                </span>
-              </div>
-            ))}
-          </div>
+         <div className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+  {filtered.map((tx) => (
+    <div 
+      key={tx.id} 
+      className="flex justify-between items-center p-6 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+    >
+      <div className="flex flex-col">
+        <span className="text-sm font-bold text-slate-900 dark:text-white">{tx.description}</span>
+        <span className="text-[10px] uppercase font-black text-slate-400 dark:text-slate-500">
+          {tx.date} • {tx.accountName}
+        </span>
+      </div>
+      <span className={`font-mono font-black ${tx.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+        {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount, currency, locale)}
+      </span>
+    </div>
+  ))}
+</div>
         )}
       </div>
     </div>

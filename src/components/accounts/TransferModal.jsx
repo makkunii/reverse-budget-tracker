@@ -21,9 +21,9 @@ export function TransferModal({ isOpen, onClose, onTransfer, accounts, symbol })
         
         {/* Source Account */}
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Source Pool</label>
+          <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">Source Pool</label>
           <select 
-            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all cursor-pointer"
+            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all cursor-pointer"
             onChange={e => setSourceId(e.target.value)} 
             required
           >
@@ -34,9 +34,9 @@ export function TransferModal({ isOpen, onClose, onTransfer, accounts, symbol })
 
         {/* Target Account */}
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Destination Pool</label>
+          <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">Destination Pool</label>
           <select 
-            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all cursor-pointer"
+            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all cursor-pointer"
             onChange={e => setTargetId(e.target.value)} 
             required
           >
@@ -47,16 +47,16 @@ export function TransferModal({ isOpen, onClose, onTransfer, accounts, symbol })
 
         {/* Amount */}
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
+          <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5">
             <Landmark size={12} /> Transfer Amount
           </label>
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black text-sm">{symbol}</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-black text-sm">{symbol}</span>
             <input 
               type="number" 
               step="any"
               placeholder="0.00" 
-              className="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl text-sm font-black font-mono focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+              className="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-sm font-black font-mono focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
               onChange={e => setAmount(e.target.value)} 
               required 
             />
@@ -66,7 +66,7 @@ export function TransferModal({ isOpen, onClose, onTransfer, accounts, symbol })
         {/* Action Button */}
         <button 
           type="submit"
-          className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-2xl text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-slate-900/10"
+          className="w-full bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-500 text-white font-bold py-3.5 rounded-2xl text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-slate-900/10"
         >
           <ArrowRightLeft size={14} /> Execute Transfer
         </button>

@@ -31,12 +31,12 @@ export function TransactionFormModal({ isOpen, onClose, onSave, accounts, symbol
       <form onSubmit={handleSubmit} className="space-y-6 pt-2">
         
         {/* Type Toggle */}
-        <div className="flex p-1 bg-slate-100 rounded-2xl">
+        <div className="flex p-1 bg-slate-100 dark:bg-slate-950 rounded-2xl">
           <button
             type="button"
             onClick={() => setType('expense')}
             className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${
-              type === 'expense' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500'
+              type === 'expense' ? 'bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 shadow-sm' : 'text-slate-500 dark:text-slate-500'
             }`}
           >
             EXPENSE
@@ -45,7 +45,7 @@ export function TransactionFormModal({ isOpen, onClose, onSave, accounts, symbol
             type="button"
             onClick={() => setType('income')}
             className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${
-              type === 'income' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500'
+              type === 'income' ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-slate-500 dark:text-slate-500'
             }`}
           >
             INCOME
@@ -54,7 +54,7 @@ export function TransactionFormModal({ isOpen, onClose, onSave, accounts, symbol
 
         {/* Description */}
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
+          <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5">
             <FileText size={12} /> Description
           </label>
           <input 
@@ -63,17 +63,17 @@ export function TransactionFormModal({ isOpen, onClose, onSave, accounts, symbol
             value={description}
             onChange={e => setDescription(e.target.value)}
             required
-            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
           />
         </div>
 
         {/* Amount */}
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
+          <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5">
             <Landmark size={12} /> Amount
           </label>
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black text-sm">{symbol}</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-black text-sm">{symbol}</span>
             <input 
               type="number" 
               step="any"
@@ -81,21 +81,21 @@ export function TransactionFormModal({ isOpen, onClose, onSave, accounts, symbol
               value={amount}
               onChange={e => setAmount(e.target.value)}
               required
-              className="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl text-sm font-black font-mono focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+              className="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-sm font-black font-mono focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
             />
           </div>
         </div>
 
         {/* Account Selector */}
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
+          <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5">
             <Tag size={12} /> Source Account
           </label>
           <select 
             value={accountId}
             onChange={e => setAccountId(e.target.value)}
             required
-            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all cursor-pointer"
+            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all cursor-pointer"
           >
             <option value="">Select account...</option>
             {accounts.map(acc => (
@@ -112,7 +112,7 @@ export function TransactionFormModal({ isOpen, onClose, onSave, accounts, symbol
           className={`w-full py-4 rounded-2xl text-xs font-black text-white transition-all shadow-lg flex items-center justify-center gap-2 ${
             type === 'income' 
               ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20' 
-              : 'bg-slate-900 hover:bg-slate-800 shadow-slate-900/20'
+              : 'bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 shadow-slate-900/20'
           }`}
         >
           <Plus size={14} /> Log {type}

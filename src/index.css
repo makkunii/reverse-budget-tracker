@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
-body {
-  @apply bg-slate-50 text-slate-900 min-h-screen antialiased;
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-bg-primary: var(--bg-primary);
+  --color-text-primary: var(--text-primary);
+  --color-card-bg-dark: theme(colors.slate.900);
+}
+
+:root {
+  --bg-primary: #f8fafc; /* slate-50 */
+  --text-primary: #0f172a; /* slate-900 */
+}
+
+.dark {
+  --bg-primary: #020617; /* slate-950 */
+  --text-primary: #f1f5f9; /* slate-100 */
 }

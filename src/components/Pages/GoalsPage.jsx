@@ -37,35 +37,35 @@ export function GoalsPage({
           const pct = Math.min(Math.round((goal.currentAmount / goal.targetAmount) * 100) || 0, 100);
 
           return (
-            <div key={secureId} className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col gap-4">
+            <div key={secureId} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col gap-4">
               <div className="flex justify-between items-start">
                 <div className="min-w-0">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border" 
-                        style={{ color: cat?.color, borderColor: `${cat?.color}40`, backgroundColor: `${cat?.color}10` }}>
+                        style={{ color: cat?.color, borderColor: `${cat?.color}40`, backgroundColor: `${cat?.color}20` }}>
                     {cat?.name || 'General'}
                   </span>
-                  <h4 className="text-base font-black text-slate-900 mt-2 truncate">{goal.title}</h4>
+                  <h4 className="text-base font-black text-slate-900 dark:text-white mt-2 truncate">{goal.title}</h4>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <button onClick={() => setSelectedGoal(goal)} className="p-1.5 text-slate-400 hover:text-indigo-600 bg-slate-50 rounded-lg">
+                  <button onClick={() => setSelectedGoal(goal)} className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 dark:bg-slate-700 rounded-lg">
                     <ArrowUpDown size={14} />
                   </button>
-                  <button onClick={() => onOpenEditGoal(goal)} className="p-1.5 text-slate-400 hover:text-indigo-600"><Edit3 size={14} /></button>
-                  <button onClick={() => setGoalToDelete(goal)} className="p-1.5 text-slate-400 hover:text-rose-600"><Trash2 size={14} /></button>
+                  <button onClick={() => onOpenEditGoal(goal)} className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"><Edit3 size={14} /></button>
+                  <button onClick={() => setGoalToDelete(goal)} className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-rose-600"><Trash2 size={14} /></button>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <div className="flex justify-between items-end">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Current Progress</span>
-                  <span className="text-sm font-black text-slate-900">{pct}%</span>
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Current Progress</span>
+                  <span className="text-sm font-black text-slate-900 dark:text-white">{pct}%</span>
                 </div>
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
                   <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${pct}%`, backgroundColor: cat?.color || '#6366f1' }} />
                 </div>
                 <div className="flex justify-between items-center pt-1 font-mono">
-                  <span className="text-[11px] font-black text-slate-900">{formatCurrency(goal.currentAmount, currency, locale)}</span>
-                  <span className="text-[9px] font-bold text-slate-400 uppercase">Target: {formatCurrency(goal.targetAmount, currency, locale)}</span>
+                  <span className="text-[11px] font-black text-slate-900 dark:text-slate-200">{formatCurrency(goal.currentAmount, currency, locale)}</span>
+                  <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase">Target: {formatCurrency(goal.targetAmount, currency, locale)}</span>
                 </div>
               </div>
             </div>
@@ -76,8 +76,8 @@ export function GoalsPage({
       {/* Fund Movement Modal */}
       {selectedGoal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl animate-in fade-in zoom-in-95">
-            <h3 className="text-lg font-black text-slate-900 mb-4">Move Funds: {selectedGoal.title}</h3>
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-md shadow-2xl animate-in fade-in zoom-in-95 border border-slate-200 dark:border-slate-800">
+            <h3 className="text-lg font-black text-slate-900 dark:text-white mb-4">Move Funds: {selectedGoal.title}</h3>
             <FundMovementPanel 
               goal={selectedGoal} 
               accounts={accounts} 
@@ -92,7 +92,7 @@ export function GoalsPage({
             />
             <button 
               onClick={() => setSelectedGoal(null)} 
-              className="mt-4 w-full text-slate-400 text-xs font-bold py-2 hover:text-slate-600"
+              className="mt-4 w-full text-slate-400 dark:text-slate-500 text-xs font-bold py-2 hover:text-slate-600 dark:hover:text-slate-300"
             >
               Cancel
             </button>
@@ -103,14 +103,14 @@ export function GoalsPage({
       {/* Delete Confirmation Modal */}
       {goalToDelete && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-xs shadow-2xl animate-in fade-in zoom-in-95 text-center">
-            <div className="mx-auto w-12 h-12 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mb-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-xs shadow-2xl animate-in fade-in zoom-in-95 text-center border border-slate-200 dark:border-slate-800">
+            <div className="mx-auto w-12 h-12 bg-rose-50 dark:bg-rose-950/50 text-rose-500 rounded-2xl flex items-center justify-center mb-4">
               <AlertTriangle size={24} />
             </div>
-            <h3 className="text-lg font-black text-slate-900">Delete Target?</h3>
-            <p className="text-xs text-slate-500 mt-2 mb-6">Are you sure you want to delete "{goalToDelete.title}"? This action cannot be undone.</p>
+            <h3 className="text-lg font-black text-slate-900 dark:text-white">Delete Target?</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-6">Are you sure you want to delete "{goalToDelete.title}"? This action cannot be undone.</p>
             <div className="flex gap-2">
-              <button onClick={() => setGoalToDelete(null)} className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-3 rounded-xl">Cancel</button>
+              <button onClick={() => setGoalToDelete(null)} className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs py-3 rounded-xl">Cancel</button>
               <button 
                 onClick={() => { onDeleteGoal(goalToDelete.id); setGoalToDelete(null); }} 
                 className="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-3 rounded-xl"

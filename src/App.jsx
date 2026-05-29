@@ -15,11 +15,12 @@ import { TransferModal } from './components/accounts/TransferModal';
 import { WhatsNewModal } from './components/dashboard/WhatsNewModal';
 import { Header } from './components/common/Header';
 import { BuyMeACoffeeModal } from './components/dashboard/BuyMeACoffeeModal';
+import { SettingsModal } from './components/common/SettingsModal';
 
 import { Wallet, Coffee } from 'lucide-react';
 
 const INITIAL_APP_STATE = {
-  settings: { currency: 'PHP', locale: 'en-PH', lastSeenVersion: '0.0.0' },
+  settings: { currency: 'PHP', locale: 'en-PH', lastSeenVersion: '0.0.0', darkMode: false },
   accounts: [],
   categories: [
     { id: 'cat-1', name: 'Emergency Fund', color: '#f43f5e' },
@@ -37,7 +38,28 @@ export default function App() {
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isLogTransactionOpen, setIsLogTransactionOpen] = useState(false);
 
+  const [showCoffeeButton, setShowCoffeeButton] = useState(false);
   const [isCoffeeModalOpen, setIsCoffeeModalOpen] = useState(false);
+
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  useEffect(() => {
+    const scheduleButton = () => {
+      const randomWait = Math.floor(Math.random() * (300000 - 60000 + 1) + 60000);
+      
+      setTimeout(() => {
+        setShowCoffeeButton(true);
+        
+        setTimeout(() => {
+          setShowCoffeeButton(false);
+          scheduleButton();
+        }, 120000);
+        
+      }, randomWait);
+    };
+
+    scheduleButton();
+  }, []);
   
   // Modal layout states
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
@@ -439,8 +461,17 @@ export default function App() {
     }));
   };
 
+  useEffect(() => {
+    if (appState.settings.darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [appState.settings.darkMode]);
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 p-4 md:p-10">
+    // <div className="min-h-screen bg-slate-50 text-slate-900 p-4 md:p-10">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors p-4 md:p-10">
       <div className="max-w-7xl mx-auto space-y-6">
         
         {/* Header Block Section */}
@@ -450,14 +481,17 @@ export default function App() {
           currentLocale={currentLocale}
           currencies={currencies}
           onCurrencyChange={handleCurrencyChange}
+          onOpenSettings={() => setIsSettingsOpen(true)}
         />
 
-        <button 
-  onClick={() => setIsCoffeeModalOpen(true)}
-  className="fixed bottom-6 right-6 p-4 bg-amber-500 text-white rounded-full shadow-xl hover:bg-amber-600 transition-all"
->
-  <Coffee size={24} />
-</button>
+        {showCoffeeButton && (
+          <button 
+            onClick={() => setIsCoffeeModalOpen(true)}
+            className="fixed bottom-6 right-6 p-4 bg-amber-500 text-white rounded-full shadow-xl hover:bg-amber-600 transition-all animate-bounce"
+          >
+            <Coffee size={24} />
+          </button>
+        )}
 
         {/* Global Navigation Component */}
         <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
@@ -548,6 +582,23 @@ export default function App() {
         <BuyMeACoffeeModal 
           isOpen={isCoffeeModalOpen} 
           onClose={() => setIsCoffeeModalOpen(false)} 
+        />
+
+        <SettingsModal 
+          isOpen={isSettingsOpen} 
+          onClose={() => setIsSettingsOpen(false)}
+          currency={currentCurrency}
+          currencies={currencies}
+          onCurrencyChange={handleCurrencyChange}
+          appState={appState}
+          setAppState={setAppState}
+          isDark={appState.settings.darkMode || false} 
+          onToggleTheme={() => {
+            setAppState(prev => ({
+              ...prev,
+              settings: { ...prev.settings, darkMode: !prev.settings.darkMode }
+            }));
+          }}
         />
       </div>
     </div>
