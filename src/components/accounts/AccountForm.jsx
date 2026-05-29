@@ -79,7 +79,7 @@ export function AccountForm({ onSaveAccount, onClose, symbol, editAccount = null
           <option value="Digital Wallet">Digital Wallet</option>
           <option value="High-Yield Savings">High-Yield Savings</option>
           <option value="Traditional Bank">Traditional Bank Account</option>
-          <option value="Traditional Bank">Cash</option>
+          <option value="Cash">Cash</option>
         </select>
       </div>
 
