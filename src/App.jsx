@@ -619,7 +619,7 @@ export default function App() {
         />
 
         <WhatsNewModal 
-          currentVersion="1.0.8" 
+          currentVersion="1.0.9" 
           lastSeenVersion={appState.settings.lastSeenVersion}
           onUpdateVersion={handleUpdateVersion}
         />
