@@ -176,17 +176,60 @@ export default function App() {
 
     const totalAllocated = Object.values(allocations).reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
 
+    // Find the account name up front so it's guaranteed fresh and available
+    const currentAccount = appState.accounts.find(a => a.id === accountId);
+    const targetAccountName = currentAccount ? currentAccount.name : 'Payday Pool';
+
     setAppState(prev => {
+      // 1. Generate the master top-line Income record for the master ledger
+      const masterIncomeTx = {
+        id: crypto.randomUUID(),
+        date: timestamp,
+        type: 'income',
+        amount: income,
+        description: 'Payday Income Received',
+        accountId: accountId,
+        accountName: targetAccountName
+      };
+
+      // 2. Map through active allocations to generate matching expense rows for the master ledger
+      const allocationTxs = Object.entries(allocations)
+        .filter(([_, value]) => parseFloat(value) > 0)
+        .map(([goalId, value]) => {
+          const goalObj = prev.goals.find(g => g.id === goalId);
+          return {
+            id: crypto.randomUUID(),
+            date: timestamp,
+            type: 'expense', 
+            amount: parseFloat(value),
+            description: `Allocated to: ${goalObj ? goalObj.title : 'Target Milestone'}`,
+            accountId: accountId,
+            accountName: targetAccountName
+          };
+        });
+
+      // 3. Update Goals (Now passing accountName into the sub-log!)
       const updatedGoals = prev.goals.map(goal => {
         const amt = parseFloat(allocations[goal.id]) || 0;
         if (amt <= 0) return goal;
         return { 
           ...goal, 
           currentAmount: goal.currentAmount + amt,
-          transactionLogs: [{ id: crypto.randomUUID(), date: timestamp, type: 'deposit', amount: amt, description: 'Payday Allocation' }, ...goal.transactionLogs]
+          transactionLogs: [
+            { 
+              id: crypto.randomUUID(), 
+              date: timestamp, 
+              type: 'deposit', 
+              amount: amt, 
+              description: 'Payday Allocation',
+              accountName: targetAccountName // 👈 FIXED: Feeds the source account name to the goal history card
+            }, 
+            ...(goal.transactionLogs || [])
+          ]
         };
       });
 
+      // 4. Update Accounts
       const updatedAccounts = prev.accounts.map(acc => {
         if (acc.id === accountId) {
           return { 
@@ -202,7 +245,8 @@ export default function App() {
         ...prev,
         accounts: updatedAccounts,
         goals: updatedGoals,
-        history: [{ id: crypto.randomUUID(), date: timestamp, totalIncome: income, allocatedToGoals: totalAllocated, safeToSpend, accountName: prev.accounts.find(a => a.id === accountId)?.name || 'Payday' }, ...prev.history]
+        transactions: [masterIncomeTx, ...allocationTxs, ...(prev.transactions || [])],
+        history: [{ id: crypto.randomUUID(), date: timestamp, totalIncome: income, allocatedToGoals: totalAllocated, safeToSpend, accountName: targetAccountName }, ...prev.history]
       };
     });
   };
@@ -524,6 +568,7 @@ export default function App() {
               currency={currentCurrency} locale={currentLocale} symbol={activeCurrencyMeta.symbol}
               onOpenAddGoal={handleOpenAddGoal} onOpenEditGoal={handleOpenEditGoal} onDeleteGoal={handleDeleteGoal}
               onUpdateGoalFunds={handleUpdateGoalFunds}
+              onSaveGoal={handleSaveGoal}
               onOpenCategoryManager={() => setIsCatModalOpen(true)}
             />
           )}
@@ -574,7 +619,7 @@ export default function App() {
         />
 
         <WhatsNewModal 
-          currentVersion="1.0.7" 
+          currentVersion="1.0.8" 
           lastSeenVersion={appState.settings.lastSeenVersion}
           onUpdateVersion={handleUpdateVersion}
         />

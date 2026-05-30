@@ -7,6 +7,14 @@ export function FundMovementPanel({
   goal, accounts, currency, locale, symbol, 
   currentAccount, txAmount, onAccountChange, onAmountChange, onMoveFunds 
 }) {
+  // Find the live selected account object to check its balance restrictions
+  const activeAccountObj = accounts.find(a => a.id === currentAccount) || accounts[0];
+  const parsedTxAmount = parseFloat(txAmount) || 0;
+
+  // Safety Overdraft Checks
+  const isOverdrawingAccount = activeAccountObj ? activeAccountObj.balance < parsedTxAmount : true;
+  const isOverdrawingGoal = goal.currentAmount < parsedTxAmount;
+
   return (
     <div className="space-y-6">
       {/* Transaction Controls */}
@@ -18,7 +26,7 @@ export function FundMovementPanel({
           <select 
             value={currentAccount} 
             onChange={(e) => onAccountChange(e.target.value)} 
-            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all cursor-pointer"
           >
             {accounts.map(a => (
               <option key={a.id} value={a.id}>
@@ -36,6 +44,7 @@ export function FundMovementPanel({
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-black text-sm">{symbol}</span>
             <input 
               type="number" 
+              step="any"
               placeholder="0.00" 
               value={txAmount} 
               onChange={(e) => onAmountChange(e.target.value)} 
@@ -47,17 +56,22 @@ export function FundMovementPanel({
 
       {/* Action Buttons */}
       <div className="grid grid-cols-2 gap-3">
+        {/* Shift In (Deposit to Goal, Withdraw from Account) */}
         <button 
+          type="button"
           onClick={() => onMoveFunds('deposit')} 
-          disabled={!txAmount || txAmount <= 0} 
-          className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white font-black text-xs py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-600/20"
+          disabled={parsedTxAmount <= 0 || isOverdrawingAccount} 
+          className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-black text-xs py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-600/20"
         >
           <ArrowDownToLine size={14} /> Shift In
         </button>
+
+        {/* Pull Out (Withdraw from Goal, Deposit to Account) */}
         <button 
+          type="button"
           onClick={() => onMoveFunds('withdraw')} 
-          disabled={!txAmount || txAmount <= 0 || goal.currentAmount < txAmount} 
-          className="bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 disabled:opacity-40 text-white font-black text-xs py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-slate-900/10"
+          disabled={parsedTxAmount <= 0 || isOverdrawingGoal} 
+          className="bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-black text-xs py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-slate-900/10"
         >
           <ArrowUpFromLine size={14} /> Pull Out
         </button>

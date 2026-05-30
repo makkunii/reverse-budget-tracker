@@ -1,26 +1,19 @@
 import React, { useState } from 'react';
-import { Edit3, Trash2, ArrowUpDown, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { GoalsHeader } from '../goals/GoalsHeader';
-import { FundMovementPanel } from '../goals/FundMovementPanel';
-import { formatCurrency } from '../../utils/formatters';
+import { GoalCard } from '../goals/GoalCard';
+import { ViewGoalModal } from '../goals/ViewGoalModal';
 
 export function GoalsPage({ 
   goals = [], categories = [], accounts = [], currency, locale, symbol,
-  onOpenAddGoal, onOpenEditGoal, onDeleteGoal, onUpdateGoalFunds, onOpenCategoryManager 
+  onOpenAddGoal, onSaveGoal, onDeleteGoal, onUpdateGoalFunds, onOpenCategoryManager 
 }) {
-  const [selectedGoal, setSelectedGoal] = useState(null);
+  const [activeGoalId, setActiveGoalId] = useState(null);
   const [goalToDelete, setGoalToDelete] = useState(null);
-  const [txAccounts, setTxAccounts] = useState({});
-  const [txAmounts, setTxAmounts] = useState({});
+  const [openMenuId, setOpenMenuId] = useState(null);
 
-  const handleFundMovement = (goalId, actionType) => {
-    const amount = parseFloat(txAmounts[goalId]) || 0;
-    const accountId = txAccounts[goalId] || accounts[0]?.id;
-    if (amount <= 0 || !accountId) return;
-    onUpdateGoalFunds({ goalId, accountId, amount, action: actionType });
-    setTxAmounts(prev => ({ ...prev, [goalId]: '' }));
-    setSelectedGoal(null);
-  };
+  // Dynamically extract the fresh goal details from live state array
+  const liveActiveGoal = goals.find(g => g.id === activeGoalId);
 
   return (
     <div className="space-y-6">
@@ -30,75 +23,46 @@ export function GoalsPage({
         onOpenCategoryManager={onOpenCategoryManager}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {goals.map((goal, index) => {
-          const secureId = goal.id || `temp-${index}`;
-          const cat = categories.find(c => c.id === goal.categoryId);
-          const pct = Math.min(Math.round((goal.currentAmount / goal.targetAmount) * 100) || 0, 100);
-
-          return (
-            <div key={secureId} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col gap-4">
-              <div className="flex justify-between items-start">
-                <div className="min-w-0">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border" 
-                        style={{ color: cat?.color, borderColor: `${cat?.color}40`, backgroundColor: `${cat?.color}20` }}>
-                    {cat?.name || 'General'}
-                  </span>
-                  <h4 className="text-base font-black text-slate-900 dark:text-white mt-2 truncate">{goal.title}</h4>
-                </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <button onClick={() => setSelectedGoal(goal)} className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 dark:bg-slate-700 rounded-lg">
-                    <ArrowUpDown size={14} />
-                  </button>
-                  <button onClick={() => onOpenEditGoal(goal)} className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"><Edit3 size={14} /></button>
-                  <button onClick={() => setGoalToDelete(goal)} className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-rose-600"><Trash2 size={14} /></button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between items-end">
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Current Progress</span>
-                  <span className="text-sm font-black text-slate-900 dark:text-white">{pct}%</span>
-                </div>
-                <div className="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
-                  <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${pct}%`, backgroundColor: cat?.color || '#6366f1' }} />
-                </div>
-                <div className="flex justify-between items-center pt-1 font-mono">
-                  <span className="text-[11px] font-black text-slate-900 dark:text-slate-200">{formatCurrency(goal.currentAmount, currency, locale)}</span>
-                  <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase">Target: {formatCurrency(goal.targetAmount, currency, locale)}</span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+        {goals.map((goal, index) => (
+          <GoalCard 
+            key={goal.id || `temp-${index}`}
+            goal={goal}
+            category={categories.find(c => c.id === goal.categoryId)}
+            currency={currency}
+            locale={locale}
+            menuId={openMenuId}
+            onMenuToggle={(id) => setOpenMenuId(id)}
+            onSelect={(g) => {
+              setActiveGoalId(g.id);
+              setOpenMenuId(null); // Close active options list on selection click
+            }}
+            onEdit={(g) => {
+              setActiveGoalId(g.id); // Open the unified view modal
+              setOpenMenuId(null);   // Close the dropdown cleanly
+            }}
+            onDelete={(g) => {
+              setGoalToDelete(g);
+              setOpenMenuId(null);   // Close the dropdown cleanly
+            }}
+          />
+        ))}
       </div>
 
-      {/* Fund Movement Modal */}
-      {selectedGoal && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-md shadow-2xl animate-in fade-in zoom-in-95 border border-slate-200 dark:border-slate-800">
-            <h3 className="text-lg font-black text-slate-900 dark:text-white mb-4">Move Funds: {selectedGoal.title}</h3>
-            <FundMovementPanel 
-              goal={selectedGoal} 
-              accounts={accounts} 
-              currency={currency} 
-              locale={locale} 
-              symbol={symbol}
-              currentAccount={txAccounts[selectedGoal.id] || accounts[0]?.id}
-              txAmount={txAmounts[selectedGoal.id] || ''}
-              onAccountChange={(id) => setTxAccounts(prev => ({ ...prev, [selectedGoal.id]: id }))}
-              onAmountChange={(val) => setTxAmounts(prev => ({ ...prev, [selectedGoal.id]: val }))}
-              onMoveFunds={(action) => handleFundMovement(selectedGoal.id, action)}
-            />
-            <button 
-              onClick={() => setSelectedGoal(null)} 
-              className="mt-4 w-full text-slate-400 dark:text-slate-500 text-xs font-bold py-2 hover:text-slate-600 dark:hover:text-slate-300"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Unified View / Edit / Fund Movement Modal */}
+      <ViewGoalModal 
+        isOpen={!!activeGoalId}
+        onClose={() => setActiveGoalId(null)}
+        goal={liveActiveGoal}
+        category={categories.find(c => c?.id === liveActiveGoal?.categoryId)}
+        accounts={accounts}
+        currency={currency}
+        locale={locale}
+        symbol={symbol}
+        categories={categories}
+        onSave={onSaveGoal}
+        onUpdateGoalFunds={onUpdateGoalFunds}
+      />
 
       {/* Delete Confirmation Modal */}
       {goalToDelete && (
@@ -110,10 +74,10 @@ export function GoalsPage({
             <h3 className="text-lg font-black text-slate-900 dark:text-white">Delete Target?</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-6">Are you sure you want to delete "{goalToDelete.title}"? This action cannot be undone.</p>
             <div className="flex gap-2">
-              <button onClick={() => setGoalToDelete(null)} className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs py-3 rounded-xl">Cancel</button>
+              <button onClick={() => setGoalToDelete(null)} className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs py-3 rounded-xl transition-colors">Cancel</button>
               <button 
                 onClick={() => { onDeleteGoal(goalToDelete.id); setGoalToDelete(null); }} 
-                className="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-3 rounded-xl"
+                className="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-3 rounded-xl transition-colors"
               >
                 Delete
               </button>

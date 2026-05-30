@@ -20,11 +20,11 @@ export function WhatsNewModal({ currentVersion, lastSeenVersion, onUpdateVersion
       <div className="space-y-4 text-sm text-slate-600 dark:text-slate-300">
         <p>We've added some exciting updates:</p>
         <ul className="list-disc pl-4 space-y-2 marker:text-indigo-500">
+          <li><strong>Goals and Account:</strong> You can now add an image reference for your Goals and Accounts!</li>
           <li><strong>Download and Restore:</strong> Your you can now download your data and import it!</li>
           <li><strong>Dark Mode:</strong> You can now toggle from dark mode to light mode!</li>
           <li><strong>Automated Interest Payouts:</strong> Your savings now grow automatically!</li>
           <li><strong>Account Transfer:</strong> You can now transfer money to different accounts.</li>
-          <li><strong>Transaction Ledger:</strong> You can now track your expenses and incomes.</li>
         </ul>
         <button 
           onClick={handleClose} 
